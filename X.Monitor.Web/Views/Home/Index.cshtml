@@ -1,0 +1,100 @@
+﻿@{
+	ViewData["Title"] = "Process Monitor";
+}
+
+<style>
+	#cpu-total {
+		display: none;
+	}
+
+	#ram-total {
+		display: none;
+	}
+
+	.warning-div-left {
+		float: left;
+		width: 60px;
+		margin-right: 8px;
+	}
+</style>
+
+<h1>Process</h1>
+<div id="cpu-total">
+	<div class="warning-div-left">CPU:</div>
+	<div id="cpu-warning"></div>
+</div>
+<div id="ram-total">
+	<div class="warning-div-left">RAM:</div>
+	<div id="ram-warning"></div>
+</div>
+
+<div id="process-list"></div>
+
+@section Scripts {
+	<script>
+		$(function () {
+
+			var protocol = location.protocol === "https:" ? "wss:" : "ws:";
+			var wsUri = protocol + "//" + window.location.host + "/ws";
+			var socket = new WebSocket(wsUri);
+
+			socket.onopen = e => {
+				console.log("socket opened", e);
+			};
+
+			socket.onclose = function (e) {
+				console.log("socket closed", e);
+			};
+
+			socket.onmessage = function (e) {
+				console.log(e);
+
+				var usageTotal = JSON.parse(e.data);
+				let cpu = usageTotal.cpu;
+				let ram = usageTotal.ram;
+
+				if (cpu > 0) {
+					document.getElementById('cpu-warning').textContent = cpu;
+					showElement('cpu-total');
+				} else {
+					document.getElementById('cpu-warning').textContent = '';
+					hideElement('cpu-total');
+				}
+
+				if (ram > 0) {
+					document.getElementById('ram-warning').textContent = ram;
+					showElement('ram-total');
+				} else {
+					document.getElementById('ram-warning').textContent = '';
+					hideElement('ram-total');
+				}
+			};
+
+			socket.onerror = function (e) {
+				console.error(e.data);
+			};
+
+			loadProcesses();
+			setInterval(() => loadProcesses(), 2500);
+
+			function loadProcesses()
+			{
+				$("#process-list").load("/Home/ProcessList");
+			}
+
+			function showElement(id) {
+				var element = document.getElementById(id)
+				if (element.style.display !== "block") {
+					element.style.display = "block";
+				} 
+			}
+
+			function hideElement(id) {
+				var element = document.getElementById(id)
+				if (element.style.display !== "none") {
+					element.style.display = "none";
+				}
+			}
+		});
+	</script>
+}

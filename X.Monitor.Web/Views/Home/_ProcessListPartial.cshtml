@@ -1,0 +1,34 @@
+﻿@model List<ProcessItemViewModel>
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>
+				@Html.DisplayNameFor(model => model[0].Name)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model[0].Cpu)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model[0].Ram)
+			</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			<tr>
+				<td>
+					@Html.DisplayFor(modelItem => item.Name)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.Cpu)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.Ram)
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
