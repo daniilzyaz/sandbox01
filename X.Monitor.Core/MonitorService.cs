@@ -53,13 +53,12 @@ namespace X.Monitor.Core
 			if (Processes.IsEmpty)
 				return totals;
 
-			var processes = Processes.Where(x => x.Key != "_Total" && x.Key != "Idle")
-									 .Select(x => x.Value);
-
+			var processes = Processes.Select(x => x.Value);
 			totals.Cpu = processes.Sum(p => p.Cpu);
 			totals.Ram = processes.Sum(p => p.Ram);
 
 			return totals;
+
 		}
 
 		private void RefreshProcesses()
@@ -67,6 +66,9 @@ namespace X.Monitor.Core
 			var processNames = GetAllProcessNames();
 			foreach (string pName in processNames)
 			{
+				if (pName.Equals("_Total", StringComparison.OrdinalIgnoreCase) || pName.Equals("Idle", StringComparison.OrdinalIgnoreCase))
+					continue;
+
 				Processes.TryAdd(pName, new ProcessUsage(pName));
 			}
 		}

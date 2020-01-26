@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using X.Monitor.Core;
 using X.Monitor.Web.BackgroundServices;
 using X.Monitor.Web.Infrastructure;
+using X.Monitor.Web.Services;
 using X.Monitor.Web.WebSockets;
 
 namespace X.Monitor.Web
@@ -47,6 +48,9 @@ namespace X.Monitor.Web
 
 			builder.RegisterInstance(MonitorService.Create());
 
+			builder.RegisterType<ProcessService>()
+				   .As<IProcessService>();
+
 			AutofacContainer = builder.Build();
 
 			return new AutofacServiceProvider(AutofacContainer);
@@ -76,50 +80,6 @@ namespace X.Monitor.Web
 
 			app.UseWebSockets(wsOptions);
 			app.UseRequestWebSocket(); // custom request middleware
-
-			//app.Use(async (context, next) => {
-			//	//if (!context.WebSockets.IsWebSocketRequest)
-			//	//	await next();
-			//	//
-			//	//var socket = await context.WebSockets.AcceptWebSocketAsync();
-			//	//var socketFinishedTcs = new TaskCompletionSource<object>();
-			//	//
-			//	//BackgroundSocketService.AddSocket(socket, socketFinishedTcs);
-			//	//
-			//	//await socketFinishedTcs.Task;
-
-			//	if (context.Request.Path == "/ws")
-			//	{
-			//		if (context.WebSockets.IsWebSocketRequest)
-			//		{
-			//			var socket = await context.WebSockets.AcceptWebSocketAsync();
-			//			var socketFinishedTcs = new TaskCompletionSource<object>();
-
-			//			var webSocketManager = AutofacContainer.Resolve<ISocketConnectionManager>();
-			//			webSocketManager.TryAddSocket(new WebSocketItem(Guid.NewGuid(), socket, socketFinishedTcs));
-						
-			//			await socketFinishedTcs.Task;
-
-			//			//var buffer = new byte[1024 * 4];
-			//			//WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-			//			//while (!result.CloseStatus.HasValue)
-			//			//{
-			//			//	await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, result.Count), result.MessageType, result.EndOfMessage, CancellationToken.None);
-			//			//
-			//			//	result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-			//			//}
-			//			//await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
-			//		}
-			//		else
-			//		{
-			//			context.Response.StatusCode = 400;
-			//		}
-			//	}
-			//	else
-			//	{
-			//		await next();
-			//	}
-			//});
 
 			app.UseMvc(routes =>
 			{

@@ -1,16 +1,16 @@
 ﻿using System.Diagnostics;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using X.Monitor.Core;
 using X.Monitor.Web.Models;
+using X.Monitor.Web.Services;
 
 namespace X.Monitor.Web.Controllers
 {
 	public class HomeController : Controller
 	{
-		private readonly MonitorService _srv;
+		private readonly IProcessService _srv;
 
-		public HomeController(MonitorService srv)
+		public HomeController(IProcessService srv)
 		{
 			_srv = srv;
 		}
@@ -22,17 +22,7 @@ namespace X.Monitor.Web.Controllers
 
 		public IActionResult ProcessList()
 		{
-			var processes = _srv.GetProccesses();
-			var vmProcessList = processes.Select(p => new ProcessItemViewModel()
-			{
-				Name = p.Name,
-				Cpu = p.Cpu,
-				Ram = p.Ram
-			})
-			.OrderByDescending(p => p.Cpu)
-			.ToList();
-
-			return PartialView("_ProcessListPartial", vmProcessList);
+			return PartialView("_ProcessListPartial", _srv.Get().ToList());
 		}
 
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

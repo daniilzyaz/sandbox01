@@ -14,6 +14,7 @@ namespace X.Monitor.Web
 		public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
 			WebHost.CreateDefaultBuilder(args)
 				.ConfigureServices(services => services.AddAutofac())
+				.UseIISIntegration()
 				.UseStartup<Startup>();
 	}
 }
